@@ -59,7 +59,7 @@ class RequestPayload(BaseModel):
 
 class UserForClient(BaseModel):
     username: str
-    email: str | None = None
+    email: str
 
 
 class User(UserForClient):
