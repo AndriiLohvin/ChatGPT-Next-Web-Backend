@@ -18,20 +18,22 @@ current_bot = Chatbot()
 
 
 @router.post("/add-new-chatbot")
-async def add_new_chatbot_api(user: Annotated[User, Depends(get_current_user)], model: AddNewBotModel):
+async def add_new_chatbot_api(model: AddNewBotModel):
     # global current_bot
 
     # current_bot =
     try:
-        return add_new_chatbot(email=user.email, botmodel=model)
+        return add_new_chatbot(email="aa@aa.com", botmodel=model)
+        # return add_new_chatbot(email=user.email, botmodel=model)
     except Exception as e:
         raise e
 
 
 @router.post("/find-all-chatbots")
-def find_all_chatbots_api(user: Annotated[User, Depends(get_current_user)]):
+def find_all_chatbots_api():
     try:
-        return find_all_chatbots(user.email)
+        return find_all_chatbots("aa@aa.com")
+        # return find_all_chatbots(user.email)
     except Exception as e:
         raise e
 
@@ -50,9 +52,10 @@ def find_chatbot_by_id_api(id: ChatBotIdModel, user: Annotated[User, Depends(get
 
 
 @router.post("/remove-chatbot")
-def remove_chatbot_api(user: Annotated[User, Depends(get_current_user)], id: str = Form(...)):
+def remove_chatbot_api(id: str = Form(...)):
     try:
-        return remove_chatbot(id, user.email)
+        return remove_chatbot(id, "aa@aa.com")
+        # return remove_chatbot(id, user.email)
     except Exception as e:
         raise e
 

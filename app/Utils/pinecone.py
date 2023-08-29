@@ -11,6 +11,7 @@ from app.Utils.web_scraping import extract_content_from_url
 from app.Models.ChatbotModel import Chatbot, RequestPayload
 from app.Models.ChatLogModel import Message, add_new_message as add_new_message_to_db
 from typing import List
+import nltk
 
 from dotenv import load_dotenv
 import os
@@ -88,7 +89,7 @@ def delete_all_data():
 
 def split_document(doc: Document):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,
+        chunk_size=1000,
         chunk_overlap=20,
         length_function=tiktoken_len,
         separators=["\n\n", "\n", " ", ""]
@@ -107,7 +108,7 @@ def train_csv(filename: str, namespace: str):
     doc = Document(page_content=total_content, metadata={"source": filename})
     chunks = split_document(doc)
     Pinecone.from_documents(
-        chunks, embeddings, index_name=index_name, namespace=namespace)
+        chunks, embeddings, p=index_name, namespace=namespace)
 
     end_time = time.time()
     print("Elapsed time: ", end_time - start_time)
@@ -191,7 +192,7 @@ def train_url(url: str, namespace: str):
     content = extract_content_from_url(url)
     doc = Document(page_content=content, metadata={"source": url})
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,
+        chunk_size=1000,
         chunk_overlap=20,
         length_function=tiktoken_len,
         separators=["\n\n", "\n", " ", ""]
@@ -216,7 +217,7 @@ def get_context(msg: str, namespace: str):
     db = Pinecone.from_existing_index(
         index_name=index_name, namespace=namespace, embedding=embeddings)
     print("search_namesapce", namespace)
-    results = db.similarity_search_with_score(msg, k=2)
+    results = db.similarity_search_with_score(msg, k=1)
     for result in results:
         # print("embedding_id: ", result.metadata['source'])
         if result[1] >= similarity_value_limit:
@@ -229,11 +230,16 @@ def get_context(msg: str, namespace: str):
     context = ""
     # for web_result in web_results:
     #     context += f"\n\n{web_result.page_content}"
+    tokens = 0
     for result in results:
-        print(result[1])
+        print(result)
         if result[1] >= similarity_value_limit:
             context += f"\n\n{result[0].page_content}"
-    print(context)
+
+            tokens += len(nltk.word_tokenize(result[0].page_content))
+
+    print("token: ", tokens)
+    # print(context)
     # print("sourceDiscloser: ", current_bot.sourceDiscloser)
     # if current_bot.sourceDiscloser == False:
     #     matching_metadata = []
