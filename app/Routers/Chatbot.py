@@ -1,7 +1,7 @@
 import shutil
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form, Body
 from app.Utils.pinecone import get_answer, get_context, train_csv, train_pdf, train_txt, train_url, train_ms_word, delete_all_data, set_prompt, delete_data_by_metadata
-from app.Models.ChatbotModel import add_page, add_file, add_new_chatbot, find_all_chatbots, remove_chatbot, find_chatbot_by_id, update_chatbot_by_id
+from app.Models.ChatbotModel import add_page, add_file, remove_file, remove_page, add_new_chatbot, find_all_chatbots, remove_chatbot, find_chatbot_by_id, update_chatbot_by_id
 from app.Models.ChatbotModel import ChatBotIdModel, User, AddNewBotModel, Chatbot, RequestPayload
 from app.Utils.web_scraping import extract_content_from_url
 
@@ -39,7 +39,7 @@ def find_all_chatbots_api():
 
 
 @router.post("/find-chatbot-by-id")
-def find_chatbot_by_id_api(id: ChatBotIdModel, user: Annotated[User, Depends(get_current_user)]):
+def find_chatbot_by_id_api(id: ChatBotIdModel):
     global current_bot
     try:
         print("logid", id.log_id)
@@ -61,8 +61,9 @@ def remove_chatbot_api(id: str = Form(...)):
 
 
 @router.post("/find-pages-by-id")
-def find_pages(user: Annotated[User, Depends(get_current_user)], id: str = Form(...)):
+def find_pages(id: str = Form(...)):
     try:
+        print("id: ",id)
         result = find_chatbot_by_id(id)
         return result.pages
     except Exception as e:
@@ -80,7 +81,7 @@ def add_new_chatbot_api(link: str = Form(...)):
 @router.post("/add-page")
 def add_page_api(id: str = Form(...), url: str = Form(...)):
     try:
-        # add_page(id, url)
+        add_page(id, url)
         train_url(url, id)
         return True
     except Exception as e:
@@ -112,7 +113,7 @@ def add_training_file_api(file: UploadFile = File(...), bot_id: str = Form(...))
         elif extension == ".docx":
             train_ms_word(file.filename, bot_id)
         print("end-training")
-        # add_file(bot_id, file.filename)
+        add_file(bot_id, file.filename)
     except Exception as e:
         print("training error")
         raise HTTPException(
@@ -122,7 +123,6 @@ def add_training_file_api(file: UploadFile = File(...), bot_id: str = Form(...))
 @router.post("/similar-context")
 def find_similar_context(user: Annotated[User, Depends(get_current_user)], msg: str = Form(...), bot_id: str = Form(...)):
     print("msg: " + str(msg))
-    global current_bot
     if len(msg.strip()) == 0:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -153,7 +153,8 @@ def clear_database():
 
 
 @router.post("/clear-database-by-metadata")
-def clear_database_by_metadata(filename: str = Form(...), id: str = Form(...)):
+def clear_database_by_metadata(filename: str = Form(...), id: str = Form(...), type: str = Form(...)):
+    remove_file(id, filename) if type == "file" else remove_page(id, filename)
     delete_data_by_metadata(filename, id)
 
 

@@ -307,6 +307,7 @@ def get_answer(request_payload: RequestPayload):
 
 
 def delete_data_by_metadata(filename: str, namespace: str):
+    
     index = pinecone.Index(index_name=index_name)
     query_response = index.delete(
         namespace=namespace,

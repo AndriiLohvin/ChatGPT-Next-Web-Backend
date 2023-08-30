@@ -74,7 +74,13 @@ def add_new_chatbot(email: str, botmodel: AddNewBotModel):
 
 
 def add_page(id: str, url: str):
+    print("_id: ", ObjectId(id))
     ChatbotsDB.update_one({"_id": ObjectId(id)}, {"$push": {"pages": url}})
+    return True
+
+def remove_page(id: str, url: str):
+    print("id: ", url)
+    ChatbotsDB.update_one({"_id": ObjectId(id)}, {"$pull": {"pages": url}})
     return True
 
 
@@ -83,6 +89,10 @@ def add_file(id: str, filename: str):
                           "$push": {"files": filename}})
     return True
 
+def remove_file(id: str, filename: str):
+    ChatbotsDB.update_one({"_id": ObjectId(id)}, {
+                          "$pull": {"files": filename}})
+    return True
 
 def find_chatbot_by_id(id: str):
     result = ChatbotsDB.find_one({"_id": ObjectId(id)})

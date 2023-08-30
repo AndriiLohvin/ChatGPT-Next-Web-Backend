@@ -89,10 +89,10 @@ def extract_content_from_url(url: str):
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome(options=options)
-
-    # driver = webdriver.Chrome(service=Service(
-    #     ChromeDriverManager().install()), options=options)
+    # driver = webdriver.Chrome(options=options)
+    print("here1: ")
+    driver = webdriver.Chrome(service=Service(
+        ChromeDriverManager().install()), options=options)
 
     driver.get(url)
     html = driver.page_source
@@ -101,7 +101,7 @@ def extract_content_from_url(url: str):
     # kill all script and style elements
     for script in soup(["script", "style"]):
         script.extract()    # rip it out
-
+    print("herer")
     # get text
     text = soup.get_text()
 
