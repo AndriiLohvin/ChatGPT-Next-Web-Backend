@@ -63,7 +63,7 @@ def remove_chatbot_api(id: str = Form(...)):
 @router.post("/find-pages-by-id")
 def find_pages(id: str = Form(...)):
     try:
-        print("id: ",id)
+        print("id: ", id)
         result = find_chatbot_by_id(id)
         return result.pages
     except Exception as e:
@@ -139,9 +139,9 @@ def answer_to_user_question(request_payload: RequestPayload):
     # print(current_bot.name, current_bot.language, current_bot.description," pass  ", current_bot.password)
     # return "hello, how can I assist you t?"
     get_context(request_payload.messages[-1]
-                ['content'], request_payload.bot_id)
+                ['content'], request_payload.bot_Id)
     try:
-        return StreamingResponse(get_answer(request_payload), media_type='text/event-stream')
+        return StreamingResponse(get_answer(request_payload, "aa@aa.com"), media_type='text/event-stream')
     except Exception as e:
         raise e
 

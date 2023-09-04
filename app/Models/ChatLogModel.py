@@ -4,7 +4,7 @@ from typing import List
 from bson import json_util
 from bson.objectid import ObjectId
 from datetime import date, datetime
-from app.Models.ChatbotModel import find_chatbot_by_id
+from app.Models.ChatbotModel import find_chatbot_by_id, ChatbotsDB
 
 ChatlogsDB = db.chatlogs
 
@@ -53,7 +53,8 @@ def remove_chatlog(id: str, email: str):
 
 def add_new_message(logId: str, msg: Message, botId: str, email: str):
     result = ChatlogsDB.find_one({"logId": logId})
-
+    print("logId: ", logId)
+    print("message: ", msg)
     if result:
         # If row with logId exists, append the new message to the existing messages list
         ChatlogsDB.update_one({"logId": logId}, {

@@ -38,6 +38,7 @@ class Chatbot(AddNewBotModel):
     email: str = ""
     pages: List = []
     files: List = []
+    messages: List = []
 
 
 class AskQuestionModel(BaseModel):
@@ -53,8 +54,9 @@ class RequestPayload(BaseModel):
     temperature: float
     presence_penalty: float
     frequency_penalty: float
-    top_p: int
-    bot_id: str
+    top_p: float
+    bot_Id: str = ""
+    log_Id: str = ""
 
 
 class UserForClient(BaseModel):
@@ -78,6 +80,7 @@ def add_page(id: str, url: str):
     ChatbotsDB.update_one({"_id": ObjectId(id)}, {"$push": {"pages": url}})
     return True
 
+
 def remove_page(id: str, url: str):
     print("id: ", url)
     ChatbotsDB.update_one({"_id": ObjectId(id)}, {"$pull": {"pages": url}})
@@ -85,14 +88,18 @@ def remove_page(id: str, url: str):
 
 
 def add_file(id: str, filename: str):
+    print("id: ", id)
+    print("filename: ", filename)
     ChatbotsDB.update_one({"_id": ObjectId(id)}, {
                           "$push": {"files": filename}})
     return True
+
 
 def remove_file(id: str, filename: str):
     ChatbotsDB.update_one({"_id": ObjectId(id)}, {
                           "$pull": {"files": filename}})
     return True
+
 
 def find_chatbot_by_id(id: str):
     result = ChatbotsDB.find_one({"_id": ObjectId(id)})

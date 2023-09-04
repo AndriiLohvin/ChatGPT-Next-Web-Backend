@@ -246,7 +246,7 @@ def get_context(msg: str, namespace: str):
     return {"context": context, "metadata": matching_metadata}
 
 
-def get_answer(request_payload: RequestPayload):
+def get_answer(request_payload: RequestPayload, email: str):
     global context
     global prompt
 
@@ -296,18 +296,18 @@ def get_answer(request_payload: RequestPayload):
                 final += string
     except Exception as e:
         print(e)
-
-    # add_new_message_to_db(logId=log_id, botId=namespace,
-    #                       msg=Message(content=msg, role="user"), email=email)
-    # add_new_message_to_db(logId=log_id, botId=namespace,
-    #                       msg=Message(content=final, role="assistant"), email=email)
+    print("content :", request_payload.messages[-1]['content'])
+    add_new_message_to_db(logId=request_payload.log_Id, botId=request_payload.bot_Id,
+                          msg=Message(content=request_payload.messages[-1]['content'], role="user"), email=email)
+    add_new_message_to_db(logId=request_payload.log_Id, botId=request_payload.bot_Id,
+                          msg=Message(content=final, role="assistant"), email=email)
 
     # print(response)
     # print(response.choices[0].message.content)
 
 
 def delete_data_by_metadata(filename: str, namespace: str):
-    
+
     index = pinecone.Index(index_name=index_name)
     query_response = index.delete(
         namespace=namespace,
