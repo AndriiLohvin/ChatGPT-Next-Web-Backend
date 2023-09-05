@@ -27,7 +27,6 @@ app.include_router(ChatLog.router, tags=["ChatLog"])
 
 
 @app.get("/", tags=["Root"])
-
 async def root():
     return {"message": "Hello World"}
 
