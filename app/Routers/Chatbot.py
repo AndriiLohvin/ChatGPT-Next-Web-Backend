@@ -1,6 +1,6 @@
 import shutil
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Form, Body
-from app.Utils.pinecone import get_answer, get_context, train_csv, train_pdf, train_txt, train_url, train_ms_word, delete_all_data, set_prompt, delete_data_by_metadata
+from app.Utils.pinecone import get_answer, get_context, train_csv, train_pdf, train_txt, train_url, train_ms_word, delete_all_data, set_prompt, delete_data_by_metadata, get_post_content
 from app.Models.ChatbotModel import add_page, add_file, remove_file, remove_page, add_new_chatbot, find_all_chatbots, remove_chatbot, find_chatbot_by_id, update_chatbot_by_id
 from app.Models.ChatbotModel import ChatBotIdModel, User, AddNewBotModel, Chatbot, RequestPayload
 from app.Utils.web_scraping import extract_content_from_url
@@ -32,6 +32,7 @@ async def add_new_chatbot_api(model: AddNewBotModel):
 @router.post("/find-all-chatbots")
 def find_all_chatbots_api():
     try:
+        print("dfsdf")
         return find_all_chatbots("aa@aa.com")
         # return find_all_chatbots(user.email)
     except Exception as e:
@@ -73,7 +74,11 @@ def find_pages(id: str = Form(...)):
 @router.post("/extract-content")
 def add_new_chatbot_api(link: str = Form(...)):
     try:
-        return extract_content_from_url(link)
+        text = extract_content_from_url(link)
+        # print(text)
+        result = get_post_content(text)
+        print(result)
+        return result
     except Exception as e:
         raise e
 

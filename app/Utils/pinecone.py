@@ -316,3 +316,23 @@ def delete_data_by_metadata(filename: str, namespace: str):
         }
     )
     print(query_response)
+
+
+def get_post_content(text: str):
+    instructor = f"""
+        This context is the content of one site.
+        {text}
+        You have to analyze above context and then have to create Instagram post for above context.
+    """
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            max_tokens=2000,
+            messages=[
+                {'role': 'system', 'content': instructor},
+                {'role': 'user', "content": "Please provide me created Instagram post using above context."}
+            ],
+        )
+        return response.choices[0].message["content"]
+    except Exception as e:
+        print(e)
