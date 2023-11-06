@@ -127,6 +127,7 @@ def train_pdf(filename: str, namespace: str):
         total_content += "\n\n" + document.page_content
     doc = Document(page_content=total_content, metadata={"source": filename})
     chunks = split_document(doc)
+    print("chunks: ", chunks)
     Pinecone.from_documents(
         documents=chunks,
         embedding=embeddings,
@@ -163,7 +164,7 @@ def train_ms_word(filename: str, namespace: str):
     loader = Docx2txtLoader(file_path=f"./train-data/{namespace}-{filename}")
     documents = loader.load()
     chunks = split_document(documents[0])
-
+    print(chunks)
     Pinecone.from_documents(
         chunks, embeddings, index_name=index_name, namespace=namespace)
     end_time = time.time()
